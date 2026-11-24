@@ -5,8 +5,9 @@
   --m: ui-monospace, "JetBrains Mono", "Noto Sans Mono", monospace;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --ground: #151310; --raised: #1F1C18; --sunk: #0E0C0A; --ink: #CBC3B5; --ink2: #A79F91; --ink3: #958D80; --rule: #302C26; --rule2: #4D473E; --accent: #EFE6D5; --accent-ink: #1C1812; --accent-soft: #3B352B; --bad: #F08A8F; --title: #EFE6D5; color-scheme: dark; }
+  :root:not([data-theme="light"]) { --ground: #151310; --raised: #1F1C18; --sunk: #0E0C0A; --ink: #CBC3B5; --ink2: #A79F91; --ink3: #958D80; --rule: #302C26; --rule2: #4D473E; --accent: #EFE6D5; --accent-ink: #1C1812; --accent-soft: #3B352B; --bad: #F08A8F; --title: #EFE6D5; color-scheme: dark; }
 }
+:root[data-theme="dark"] { --ground: #151310; --raised: #1F1C18; --sunk: #0E0C0A; --ink: #CBC3B5; --ink2: #A79F91; --ink3: #958D80; --rule: #302C26; --rule2: #4D473E; --accent: #EFE6D5; --accent-ink: #1C1812; --accent-soft: #3B352B; --bad: #F08A8F; --title: #EFE6D5; color-scheme: dark; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0; padding: 28px max(16px, env(safe-area-inset-right)) 56px max(16px, env(safe-area-inset-left)); background: var(--ground); color: var(--ink); font: 15px/1.5 var(--f); }
@@ -18,7 +19,10 @@ code { font: .9em var(--m); overflow-wrap: anywhere; }
 .num { font-family: var(--m); font-variant-numeric: tabular-nums; }
 .muted { color: var(--ink2); } .small { font-size: 13px; }
 .eyebrow { color: var(--accent); font-size: 13px; font-weight: 600; letter-spacing: .1em; }
-.top { display: grid; gap: 8px; } .lede { max-width: 60ch; text-wrap: pretty; }
+.top { display: grid; gap: 8px; }
+.bar { display: flex; gap: 8px 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.seg { display: inline-flex; border: 1px solid var(--rule2); border-radius: 6px; overflow: hidden; } .seg button { border: 0; background: none; padding: 6px 12px; font-size: 13px; } .seg button[aria-pressed=true] { background: var(--accent); color: var(--accent-ink); } .seg button:focus-visible { outline-offset: -2px; }
+ .lede { max-width: 60ch; text-wrap: pretty; }
 button, input, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

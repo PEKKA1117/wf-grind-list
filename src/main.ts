@@ -2,6 +2,7 @@
 import { DATA, type Cat, type Item } from "./data.ts";
 import { itemXp, nodeState, toggleNode } from "./calc.ts";
 import { readImport } from "./import.ts";
+import { setTheme, showTheme, type Theme } from "./theme.ts";
 import { cleanMarks, emptyMarks, makeExport, SaveError, type Known, type Marks } from "./save.ts";
 
 type Tab = "gear" | "nodes" | "synd" | "skills" | "helminth";
@@ -233,7 +234,8 @@ document.addEventListener("click", e => {
   const b = (e.target as Element).closest<HTMLElement>("button");
   if (!b) return;
   const d = b.dataset;
-  if (d.tab) { ui.tab = d.tab as Tab; chip = ""; persist(); render(); }
+  if (d.themeSet) setTheme(d.themeSet as Theme);
+  else if (d.tab) { ui.tab = d.tab as Tab; chip = ""; persist(); render(); }
   else if (d.chip !== undefined) { chip = d.chip; render(); }
   else if (d.bulk) runBulk(d.bulk, d.group!);
   else if (d.node) edit(() => { const m = toggleNode(marks.nodes[d.node!], d.which as "normal" | "sp"); if (m === undefined) delete marks.nodes[d.node!]; else marks.nodes[d.node!] = m; });
@@ -287,3 +289,4 @@ $<HTMLInputElement>("file").addEventListener("change", async e => {
 });
 $("do-paste").addEventListener("click", () => importText($<HTMLTextAreaElement>("paste").value));
 render();
+showTheme();

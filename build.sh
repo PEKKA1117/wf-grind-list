@@ -8,9 +8,10 @@ mkdir -p docs
 npm test --silent
 node_modules/.bin/tsc
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
-node_modules/.bin/esbuild src/main.ts src/style.css --bundle --minify --format=iife --target=es2022 --charset=utf8 --outdir="$tmp" --log-level=warning
+node_modules/.bin/esbuild src/main.ts src/theme-init.ts src/style.css --bundle --minify --format=iife --target=es2022 --charset=utf8 --outdir="$tmp" --log-level=warning
 # 用雜湊而非 unsafe-inline 放行腳本，注入的腳本不會執行
 hash=$(openssl dgst -sha256 -binary "$tmp/main.js" | base64)
+init=$(openssl dgst -sha256 -binary "$tmp/theme-init.js" | base64)
 {
 cat <<EOF
 <!doctype html>
@@ -18,13 +19,13 @@ cat <<EOF
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-${hash}'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-${hash}' 'sha256-${init}'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>還沒刷 · Warframe 進度清單</title>
 <style>
 EOF
 cat "$tmp/style.css"
-printf '</style>\n</head>\n<body>\n'
+printf '</style>\n<script>'; cat "$tmp/theme-init.js"; printf '</script>\n</head>\n<body>\n'
 cat index.html
 printf '<script>'; cat "$tmp/main.js"; printf '</script>\n</body>\n</html>\n'
 } > docs/index.html
