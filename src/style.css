@@ -1,20 +1,18 @@
-/* 墨藍底＋黃銅強調：黃銅＝還沒刷，完成轉中性灰 */
+/* 主色 #EFE6D5：淺色主題當底色，深色主題當強調色；完成轉中性灰 */
 :root {
-  --ground: #EEF0F4; --raised: #FFFFFF; --sunk: #E1E5EC; --ink: #171C28; --ink2: #4A5365; --ink3: #6A7385;
-  --rule: #D3D9E3; --rule2: #B3BCCB; --accent: #8A5A00; --accent-ink: #FFFFFF; --accent-soft: #F6E8CB; --bad: #A3262E;
+  --ground: #EFE6D5; --raised: #FAF6EE; --sunk: #E3D8C3; --ink: #2A2419; --ink2: #574D3C; --ink3: #675C49; --rule: #D9CDB6; --rule2: #B5A68A; --accent: #6A4A16; --accent-ink: #FFFDF8; --accent-soft: #EBDDBF; --bad: #96262A; --title: #2A2419;
   --f: system-ui, "Noto Sans TC", "Noto Sans CJK TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --m: ui-monospace, "JetBrains Mono", "Noto Sans Mono", monospace;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --ground: #0F131C; --raised: #171D29; --sunk: #0A0D14; --ink: #E6EAF2; --ink2: #A5AFC1; --ink3: #828DA1;
-    --rule: #262E3D; --rule2: #3D485C; --accent: #E2AE4F; --accent-ink: #1B1405; --accent-soft: #3A2C10; --bad: #F08A8F; color-scheme: dark; }
+  :root { --ground: #151310; --raised: #1F1C18; --sunk: #0E0C0A; --ink: #CBC3B5; --ink2: #A79F91; --ink3: #958D80; --rule: #302C26; --rule2: #4D473E; --accent: #EFE6D5; --accent-ink: #1C1812; --accent-soft: #3B352B; --bad: #F08A8F; --title: #EFE6D5; color-scheme: dark; }
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0; padding: 28px max(16px, env(safe-area-inset-right)) 56px max(16px, env(safe-area-inset-left)); background: var(--ground); color: var(--ink); font: 15px/1.5 var(--f); }
 .wrap { max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
 h1, h2, p, ul, ol { margin: 0; }
-h1 { font-size: clamp(34px, 6vw, 52px); line-height: 1.05; letter-spacing: .04em; }
+h1 { color: var(--title); font-size: clamp(34px, 6vw, 52px); line-height: 1.05; letter-spacing: .04em; }
 h2 { font-size: 18px; }
 code { font: .9em var(--m); overflow-wrap: anywhere; }
 .num { font-family: var(--m); font-variant-numeric: tabular-nums; }
