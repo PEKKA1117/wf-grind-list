@@ -1,13 +1,13 @@
-/* 主色 #EFE6D5：淺色主題當底色，深色主題當強調色；完成轉中性灰 */
+/* 主色 #EFE6D5：淺色主題當底色，深色主題當文字色，強調用琥珀；完成轉中性灰 */
 :root {
   --ground: #EFE6D5; --raised: #FAF6EE; --sunk: #E3D8C3; --ink: #2A2419; --ink2: #574D3C; --ink3: #675C49; --rule: #D9CDB6; --rule2: #B5A68A; --accent: #6A4A16; --accent-ink: #FFFDF8; --accent-soft: #EBDDBF; --bad: #96262A; --title: #2A2419;
   --f: system-ui, "Noto Sans TC", "Noto Sans CJK TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --m: ui-monospace, "JetBrains Mono", "Noto Sans Mono", monospace;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --ground: #151310; --raised: #1F1C18; --sunk: #0E0C0A; --ink: #CBC3B5; --ink2: #A79F91; --ink3: #958D80; --rule: #302C26; --rule2: #4D473E; --accent: #EFE6D5; --accent-ink: #1C1812; --accent-soft: #3B352B; --bad: #F08A8F; --title: #EFE6D5; color-scheme: dark; }
+  :root:not([data-theme="light"]) { --ground: #12100D; --raised: #1E1B16; --sunk: #080706; --ink: #EFE6D5; --ink2: #C9BEA9; --ink3: #AFA48F; --rule: #3A342B; --rule2: #82765F; --accent: #F0AC3C; --accent-ink: #1A1204; --accent-soft: #4A340F; --bad: #FF9A9E; --title: #EFE6D5; color-scheme: dark; }
 }
-:root[data-theme="dark"] { --ground: #151310; --raised: #1F1C18; --sunk: #0E0C0A; --ink: #CBC3B5; --ink2: #A79F91; --ink3: #958D80; --rule: #302C26; --rule2: #4D473E; --accent: #EFE6D5; --accent-ink: #1C1812; --accent-soft: #3B352B; --bad: #F08A8F; --title: #EFE6D5; color-scheme: dark; }
+:root[data-theme="dark"] { --ground: #12100D; --raised: #1E1B16; --sunk: #080706; --ink: #EFE6D5; --ink2: #C9BEA9; --ink3: #AFA48F; --rule: #3A342B; --rule2: #82765F; --accent: #F0AC3C; --accent-ink: #1A1204; --accent-soft: #4A340F; --bad: #FF9A9E; --title: #EFE6D5; color-scheme: dark; }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0; padding: 28px max(16px, env(safe-area-inset-right)) 56px max(16px, env(safe-area-inset-left)); background: var(--ground); color: var(--ink); font: 15px/1.5 var(--f); }
@@ -79,3 +79,10 @@ textarea { width: 100%; font-family: var(--m); font-size: 13px; resize: vertical
 .step { border: 1px solid var(--rule2); background: none; border-radius: 6px; width: 30px; height: 30px; line-height: 1; flex: none; } .step:disabled { opacity: .35; cursor: default; }
 .prog { width: 236px; }
 @media (max-width: 640px) { .right:empty { display: none; } .pill { padding: 5px 12px; } }
+/* 深色主題：瀏覽器預設的提示字與停用按鈕太暗 */
+:root[data-theme="dark"] ::placeholder { color: var(--ink3); opacity: 1; }
+:root[data-theme="dark"] .step:disabled { opacity: .5; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) ::placeholder { color: var(--ink3); opacity: 1; }
+  :root:not([data-theme="light"]) .step:disabled { opacity: .5; }
+}
