@@ -17,7 +17,6 @@ A checklist for Warframe. Tick off what you finished and see what is left. It ne
 
 ## 已知限制
 
-- 匯入 profile 還沒用真實帳號的資料驗證過，欄位依 WFCD/profile-parser
 - 裝備等級由累積經驗反推，40 級裝備要 800k（機甲 1.6M）才算滿
 
 ## 資料來源
