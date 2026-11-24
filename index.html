@@ -1,0 +1,34 @@
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Warframe · 手動進度清單</div>
+      <h1>還沒刷</h1>
+    </div>
+    <p class="muted lede">裝備、星圖、集團、內蘊與 Helminth 的清單。刷完的自己勾，就看得到還剩什麼。不連線、不讀遊戲、不需要帳號，進度只存在這個瀏覽器。</p>
+  </header>
+
+  <details class="import" id="import">
+    <summary>匯出／匯入</summary>
+    <div class="import-body">
+      <p class="small muted">把勾選存成檔案，換瀏覽器或電腦時選進來還原。只讀這頁自己匯出的檔案。</p>
+      <div class="import-row">
+        <button type="button" class="primary" id="export">匯出</button>
+        <input type="file" id="file" accept=".json,application/json" aria-label="選擇這頁的匯出檔">
+      </div>
+    </div>
+  </details>
+
+  <nav class="tabs" id="tabs" aria-label="分類"></nav>
+
+  <div class="toolbar" id="toolbar">
+    <input type="search" id="q" placeholder="搜尋中文或英文名稱" aria-label="搜尋">
+    <label class="check"><input type="checkbox" id="only-left"> 只看沒完成的</label>
+    <label class="check" id="steel-wrap"><input type="checkbox" id="steel"> 計入鋼韌之道</label>
+    <label class="check" id="xp-wrap"><input type="checkbox" id="xp-only"> 只看給段位經驗的</label>
+  </div>
+  <div class="chips" id="chips"></div>
+  <p class="small muted" id="note"></p>
+  <div class="status"><p id="msg" class="msg small" role="status"></p><button type="button" class="ghost" id="undo" hidden>復原</button></div>
+  <main id="list"></main>
+  <footer class="small muted" id="foot"></footer>
+</div>

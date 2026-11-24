@@ -1,0 +1,16 @@
+{
+  "name": "wf-grind-list",
+  "private": true,
+  "license": "CC-BY-4.0",
+  "type": "module",
+  "scripts": {
+    "build": "./build.sh",
+    "data": "node scripts/gen-data.mjs",
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}
