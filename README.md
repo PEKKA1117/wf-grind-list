@@ -2,18 +2,23 @@
 
 https://pekka1117.github.io/wf-grind-list/
 
-Warframe 的手動進度清單：裝備、星圖（一般與鋼韌之道）、集團、內蘊、Helminth。刷完的自己勾，就看得到還剩什麼、還能拿多少段位經驗。
+Warframe 的進度清單：裝備、星圖（一般與鋼韌之道）、集團、內蘊、Helminth。刷完的自己勾，或匯入自己的 profile JSON，就看得到還剩什麼、還能拿多少段位經驗。
 
-不讀遊戲、不讀帳號資料、不需要登入，也不接受遊戲或 DE 伺服器的資料檔；進度只存在瀏覽器的 localStorage，可以匯出成檔案再匯入。單一檔案，CSP `default-src 'none'` 擋掉背景連線。也可以直接用瀏覽器開 `docs/index.html`。
+不讀遊戲、不需要登入、不連線抓資料。匯入會自動分辨本頁的匯出檔與 DE 的 profile JSON，不收 inventory；只留 `data.json` 認得的 ID，帳號 ID、名稱與公會不會留下。進度只存在瀏覽器的 localStorage，可以匯出成檔案。單一檔案，CSP `default-src 'none'` 擋掉背景連線。也可以直接用瀏覽器開 `docs/index.html`。
 
-A manual checklist for Warframe. Tick off what you finished and see what is left. It reads neither the game nor your account.
+A checklist for Warframe. Tick off what you finished and see what is left. It never reads the game or fetches anything; you may import your own profile JSON.
 
 ## 開發
 
-- `scripts/gen-data.mjs` 產生 `src/data.json`；`save.ts` 匯出檔的格式與驗證；`calc.ts` 段位經驗與完成判定；`main.ts` 渲染
+- `scripts/gen-data.mjs` 產生 `src/data.json`；`save.ts` 匯出檔的格式與驗證；`import.ts` 分辨與轉換匯入檔；`calc.ts` 段位經驗與完成判定；`main.ts` 渲染
 - `./build.sh`：測試 → 型別檢查 → 打包成單檔。腳本以 CSP 雜湊放行，改完一定要重新 build
 - 遊戲改版後：`npm run data && ./build.sh`（需要 `xz`）
 - 存檔的 key 是遊戲 uniqueName 或 `gen-data.mjs` 裡的 id，不要改
+
+## 已知限制
+
+- 匯入 profile 還沒用真實帳號的資料驗證過，欄位依 WFCD/profile-parser
+- 裝備等級由累積經驗反推，40 級裝備要 800k（機甲 1.6M）才算滿
 
 ## 資料來源
 

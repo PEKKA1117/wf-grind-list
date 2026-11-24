@@ -20,7 +20,7 @@ cat <<EOF
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-${hash}'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<title>還沒刷 · Warframe 手動進度清單</title>
+<title>還沒刷 · Warframe 進度清單</title>
 <style>
 EOF
 cat "$tmp/style.css"

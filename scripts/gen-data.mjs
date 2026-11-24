@@ -65,7 +65,7 @@ for (const kind of ["Warframes", "Weapons", "Sentinels"]) {
     if (c[0] === "frame" && !/ (Prime|Umbra)$/.test(n.en)) helminth.push({ id, ...n });
   }
 }
-items.push({ id: "plexus", cat: "plexus", en: "Plexus", zh: "Plexus", max: 30, mr: 0, pts: 200 });
+items.push({ id: "plexus", cat: "plexus", en: "Plexus", zh: "銳捷號配設", max: 30, mr: 0, pts: 200 });
 
 // ---------- 星圖 ----------
 const regions = await load("Regions");

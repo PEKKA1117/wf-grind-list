@@ -1,7 +1,8 @@
 // 進入點：畫面渲染與事件。所有文字一律用 textContent，不拼 HTML
 import { DATA, type Cat, type Item } from "./data.ts";
 import { itemXp, nodeState, toggleNode } from "./calc.ts";
-import { cleanMarks, emptyMarks, makeExport, parseExport, SaveError, type Known, type Marks } from "./save.ts";
+import { readImport } from "./import.ts";
+import { cleanMarks, emptyMarks, makeExport, SaveError, type Known, type Marks } from "./save.ts";
 
 type Tab = "gear" | "nodes" | "synd" | "skills" | "helminth";
 const KEY = "wf-grind-list";
@@ -17,10 +18,10 @@ function h(tag: string, attrs: Record<string, string | boolean> = {}, ...kids: C
 
 const CATS: [Cat, string][] = [["frame", "戰甲"], ["primary", "主要武器"], ["secondary", "次要武器"], ["melee", "近戰"], ["companion", "同伴"],
   ["robotic", "同伴武器"], ["zaw", "Zaw"], ["kitgun", "組合槍"], ["amp", "增幅器"], ["kdrive", "K 式懸浮板"], ["archwing", "Archwing"],
-  ["archgun", "Archwing 槍械"], ["archmelee", "Archwing 近戰"], ["mech", "亡骸機甲"], ["plexus", "Plexus"]];
+  ["archgun", "Archwing 槍械"], ["archmelee", "Archwing 近戰"], ["mech", "亡骸機甲"], ["plexus", "銳捷號配設"]];
 const TABS: [Tab, string][] = [["gear", "裝備"], ["nodes", "星圖"], ["synd", "集團"], ["skills", "內蘊"], ["helminth", "Helminth"]];
 const NOTES: Record<Tab, string> = {
-  gear: "練到滿級就勾。+N 是練滿能拿的段位經驗，40 級裝備的 31–40 級也算。創始人限定的三件預設略過。",
+  gear: "練到滿級就勾，匯入 profile 的話會帶入目前等級，練過的排前面。+N 是練滿能拿的段位經驗，40 級裝備的 31–40 級也算。創始人限定的三件預設略過。",
   nodes: "點「一般」「鋼韌」標記通過。+N 是首通還能拿的段位經驗，一般與鋼韌之道各給一次；銳捷號兩邊都沒有。",
   synd: "用 −／+ 調到目前段位。六大集團互相敵對，不打算刷的按「略過」。",
   skills: "用 −／+ 調到目前等級，每級 1,500 段位經驗。",
@@ -31,6 +32,7 @@ const NOTES: Record<Tab, string> = {
 const FOUNDERS = DATA.items.filter(i => i.founder).map(i => `gear:${i.id}`);
 const KNOWN: Known = {
   done: new Set(DATA.items.map(x => x.id)),
+  levels: new Map(DATA.items.map(x => [x.id, x.max])),
   nodes: new Set(DATA.nodes.map(x => x.id)),
   ranks: new Map([...DATA.synd, ...DATA.skills].map(x => [x.id, x.max])),
   fed: new Set(DATA.helminth.map(x => x.id)),
@@ -57,7 +59,7 @@ const say = (text: string, bad = false): void => { const m = $("msg"); m.classNa
 function persist(): void {
   try { localStorage.setItem(KEY, JSON.stringify({ marks, ui })); } catch { say("瀏覽器拒絕存檔，重新整理後會遺失，請先匯出。", true); }
 }
-const copy = (): Marks => structuredClone({ ...marks, nodes: { ...marks.nodes }, ranks: { ...marks.ranks } });
+const copy = (): Marks => structuredClone({ ...marks, levels: { ...marks.levels }, nodes: { ...marks.nodes }, ranks: { ...marks.ranks } });
 // 單項修改：復原只給批次與匯入用，動手改之後就收起來
 function edit(f: () => void): void { undo = null; say(""); f(); persist(); render(); }
 function bulk(text: string, f: () => void): void { const before = copy(); f(); undo = before; say(text); persist(); render(); }
@@ -108,9 +110,9 @@ function tally(tab: Tab): { left: number; total: number } {
 function row(tab: Tab, id: string): Row {
   const done = isDone(tab, id), key = `${tab}:${id}`;
   if (tab === "gear") {
-    const i = ITEM.get(id)!;
-    return { key, id, zh: i.zh, en: i.en, done, lead: box("done", id, done, i.zh), meta: [i.mr > 0 && tag(`段位 ${i.mr}`), i.max === 40 && tag("40 級")],
-      right: done ? "已滿" : `+${fmt(itemXp(i))}`, wiki: i.en };
+    const i = ITEM.get(id)!, lv = marks.levels[id] ?? 0;
+    return { key, id, zh: i.zh, en: i.en, done, lead: box("done", id, done, i.zh), meta: [i.mr > 0 && tag(`段位 ${i.mr}`), lv > 0 ? h("span", { class: "tag on" }, `${lv}/${i.max}`) : i.max === 40 && tag("40 級")],
+      right: done ? "已滿" : `+${fmt(itemXp(i, lv))}`, wiki: i.en };
   }
   if (tab === "nodes") {
     const n = NODE.get(id)!, s = nodeState(n, marks.nodes[id], ui.steel);
@@ -133,6 +135,7 @@ function groups(): Group[] {
   for (const [g, title] of groupIds(tab)) {
     if (chip && chip !== g) continue;
     const ids = members(tab, g), all = ids.map(id => row(tab, id));
+    if (tab === "gear") all.sort((a, b) => Number(!!marks.levels[b.id]) - Number(!!marks.levels[a.id]));   // 穩定排序，其餘維持字母序
     const rows = all.filter(r => (!ui.onlyLeft || !r.done) && (!q || `${r.zh} ${r.en}`.toLowerCase().includes(q)));
     const bulks: HTMLElement[] = [];
     // 搜尋時不給批次，免得動到沒顯示的項目
@@ -208,7 +211,10 @@ function runBulk(kind: string, group: string): void {
   const tab = ui.tab, ids = members(tab, group), title = groupIds(tab).find(([g]) => g === group)?.[1] ?? "";
   if (kind === "gear") {
     const all = ids.every(id => marks.done.includes(id));
-    bulk(`${title}：${all ? "已全部取消" : "已全部標為練滿"}。`, () => { marks.done = all ? marks.done.filter(x => !ids.includes(x)) : [...new Set([...marks.done, ...ids])]; });
+    bulk(`${title}：${all ? "已全部取消" : "已全部標為練滿"}。`, () => {
+      marks.done = all ? marks.done.filter(x => !ids.includes(x)) : [...new Set([...marks.done, ...ids])];
+      for (const id of ids) delete marks.levels[id];
+    });
   } else if (kind === "fed") {
     const all = ids.every(id => marks.fed.includes(id));
     bulk(all ? "已全部取消。" : "已全部標為餵完。", () => { marks.fed = all ? marks.fed.filter(x => !ids.includes(x)) : [...new Set([...marks.fed, ...ids])]; });
@@ -241,7 +247,7 @@ document.addEventListener("click", e => {
 $("list").addEventListener("change", e => {
   const { act, id } = (e.target as HTMLElement).dataset;
   if (!id) return;
-  if (act === "done") edit(() => { marks.done = toggle(marks.done, id); });
+  if (act === "done") edit(() => { marks.done = toggle(marks.done, id); delete marks.levels[id]; });
   if (act === "fed") edit(() => { marks.fed = toggle(marks.fed, id); });
 });
 $("q").addEventListener("input", e => { q = (e.target as HTMLInputElement).value.trim().toLowerCase(); render(); });
@@ -260,13 +266,24 @@ $("export").addEventListener("click", () => {
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
   say("已匯出。");
 });
+function importText(text: string): void {
+  try {
+    const r = readImport(text, KNOWN, DATA.items, copy()), m = r.marks;
+    const head = r.kind === "profile" ? "已匯入 DE 的 profile，Helminth 與略過不變" : "已匯入";
+    const counts = `裝備 ${m.done.length} 件已滿、${Object.keys(m.levels).length} 件練到一半、節點 ${Object.keys(m.nodes).length}、Helminth ${m.fed.length}、略過 ${m.skip.length}`;
+    bulk(`${head}：${counts}。${r.hadProgress ? "" : "檔案裡沒有進度，保留目前的。"}${r.dropped ? `另有 ${r.dropped} 筆不認得，已忽略。` : ""}`, () => { marks = m; });
+    $<HTMLTextAreaElement>("paste").value = "";
+  } catch (err) { say(err instanceof SaveError ? err.message : `匯入失敗：${String(err)}`, true); }
+}
 $<HTMLInputElement>("file").addEventListener("change", async e => {
   const input = e.target as HTMLInputElement, f = input.files?.[0];
-  if (!f) return;
-  try {
-    const r = parseExport(await f.text(), KNOWN);
-    bulk(`已匯入：裝備 ${r.marks.done.length}、節點 ${Object.keys(r.marks.nodes).length}、Helminth ${r.marks.fed.length}、略過 ${r.marks.skip.length}。${r.dropped ? `另有 ${r.dropped} 筆不認得，已忽略。` : ""}`, () => { marks = r.marks; });
-  } catch (err) { say(err instanceof SaveError ? err.message : `匯入失敗：${String(err)}`, true); }
+  if (f) {
+    // 讀取途中檔案被改寫、移走或沒有權限時會失敗
+    let text: string | null = null;
+    try { text = await f.text(); } catch { say("讀不到這個檔案，可能被移動或改寫了，請再選一次。", true); }
+    if (text !== null) importText(text);
+  }
   input.value = "";   // 同一個檔案可以再選一次
 });
+$("do-paste").addEventListener("click", () => importText($<HTMLTextAreaElement>("paste").value));
 render();

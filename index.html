@@ -1,20 +1,22 @@
 <div class="wrap">
   <header class="top">
     <div>
-      <div class="eyebrow">Warframe · 手動進度清單</div>
+      <div class="eyebrow">Warframe · 進度清單</div>
       <h1>還沒刷</h1>
     </div>
-    <p class="muted lede">裝備、星圖、集團、內蘊與 Helminth 的清單。刷完的自己勾，就看得到還剩什麼。不連線、不讀遊戲、不需要帳號，進度只存在這個瀏覽器。</p>
+    <p class="muted lede">裝備、星圖、集團、內蘊與 Helminth 的清單。刷完的自己勾，或匯入自己的 profile JSON，就看得到還剩什麼。不連線、不讀遊戲，進度只存在這個瀏覽器。</p>
   </header>
 
   <details class="import" id="import">
     <summary>匯出／匯入</summary>
     <div class="import-body">
-      <p class="small muted">把勾選存成檔案，換瀏覽器或電腦時選進來還原。只讀這頁自己匯出的檔案。</p>
+      <p class="small muted">「匯出」把勾選存成檔案，換瀏覽器或電腦時選進來還原。也可以匯入 DE 的 profile JSON（只更新裝備、星圖、集團、內蘊；帳號 ID、名稱與公會不會留下）。</p>
       <div class="import-row">
         <button type="button" class="primary" id="export">匯出</button>
-        <input type="file" id="file" accept=".json,application/json" aria-label="選擇這頁的匯出檔">
+        <input type="file" id="file" accept=".json,.txt,.php,.htm,.html,application/json,text/plain,text/html" aria-label="選擇要匯入的檔案">
       </div>
+      <textarea id="paste" rows="3" spellcheck="false" autocomplete="off" aria-label="貼上 JSON" placeholder="或把 JSON 貼在這裡"></textarea>
+      <button type="button" class="ghost" id="do-paste">匯入貼上的內容</button>
     </div>
   </details>
 

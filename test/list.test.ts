@@ -5,8 +5,8 @@ import { itemXp, nodeState, toggleNode } from "../src/calc.ts";
 import { cleanMarks, emptyMarks, makeExport, parseExport, SaveError, type Known, type Marks } from "../src/save.ts";
 
 const D = JSON.parse(await readFile(new URL("../src/data.json", import.meta.url), "utf8"));
-const known: Known = { done: new Set(["/W"]), nodes: new Set(["N", "M"]), ranks: new Map([["Hex", 5]]), fed: new Set(["/F"]), skip: new Set(["gear:/W"]) };
-const marks = (): Marks => ({ done: ["/W"], nodes: { N: 1, M: 2 }, ranks: { Hex: 3 }, fed: ["/F"], skip: ["gear:/W"] });
+const known: Known = { done: new Set(["/W"]), levels: new Map([["/W", 30], ["/K", 40]]), nodes: new Set(["N", "M"]), ranks: new Map([["Hex", 5]]), fed: new Set(["/F"]), skip: new Set(["gear:/W"]) };
+const marks = (): Marks => ({ done: ["/W"], levels: { "/K": 32 }, nodes: { N: 1, M: 2 }, ranks: { Hex: 3 }, fed: ["/F"], skip: ["gear:/W"] });
 const plain = (x: unknown) => JSON.parse(JSON.stringify(x));
 
 test("匯出再匯入完全一致", () => {
@@ -14,7 +14,7 @@ test("匯出再匯入完全一致", () => {
   assert.deepEqual(plain(r.marks), marks()); assert.equal(r.dropped, 0);
 });
 test("只收自己的檔案；DE 的 profile 與 inventory 一律拒絕", () => {
-  for (const t of ["", "<html>", "[]", "5", "null", "{}", '{"Results":[{"LoadOutInventory":{"XPInfo":[]}}]}', '{"XPInfo":[],"InfestedFoundry":{}}', '{"format":"wf-grind-left","version":1}'])
+  for (const t of ["", "<html>", "[]", "5", "null", "{}", '{"Results":[{"LoadOutInventory":{"XPInfo":[]}}]}', '{"XPInfo":[],"InfestedFoundry":{}}', '{"format":"other","version":1}'])
     assert.throws(() => parseExport(t, known), SaveError, t);
 });
 test("版本與結構檢查", () => {
@@ -25,7 +25,7 @@ test("版本與結構檢查", () => {
 });
 test("不認得或型別不對的丟掉並計數，等級夾在上限內，多餘欄位不留", () => {
   const r = cleanMarks({ done: ["/W", "/W", "/X", 3], nodes: { N: 3, M: 2, __proto__x: 1 }, ranks: { Hex: 99, Nope: 1 }, fed: ["<img>"], skip: ["a"], who: "SECRET" }, known);
-  assert.deepEqual(plain(r.marks), { done: ["/W"], nodes: { M: 2 }, ranks: { Hex: 5 }, fed: [], skip: [] });
+  assert.deepEqual(plain(r.marks), { done: ["/W"], levels: {}, nodes: { M: 2 }, ranks: { Hex: 5 }, fed: [], skip: [] });
   assert.equal(r.dropped, 7); assert.doesNotMatch(JSON.stringify(r), /SECRET/);
   assert.deepEqual(plain(cleanMarks({ ranks: { Hex: -1 } }, known).marks.ranks), {});
   assert.deepEqual(plain(cleanMarks(JSON.parse('{"nodes":{"__proto__":1}}'), known).marks), plain(emptyMarks()));

@@ -1,7 +1,7 @@
 // 剩餘段位經驗與完成判定
 import type { Item, Node } from "./data.ts";
 
-export const itemXp = (i: Pick<Item, "max" | "pts">): number => i.max * i.pts;
+export const itemXp = (i: Pick<Item, "max" | "pts">, level = 0): number => (i.max - level) * i.pts;
 
 export interface NodeState { normal: boolean; sp: boolean; left: number; done: boolean }
 // 一般與鋼韌之道首通各給一次同額段位經驗；spOpt 不列入鋼韌之道的完成條件
